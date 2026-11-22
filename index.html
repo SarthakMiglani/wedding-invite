@@ -39,6 +39,9 @@ section{position:relative;text-align:center;padding:96px 20px 70px}
 @keyframes fall{to{transform:translate3d(var(--dx),110vh,0) rotate(540deg)}}
 .cf{position:absolute;width:7px;height:11px;pointer-events:none;animation:burst 1.8s cubic-bezier(.1,.7,.3,1) forwards;z-index:30}
 @keyframes burst{0%{transform:translate(0,0) rotate(0);opacity:1}80%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+#mus{position:fixed;z-index:60;bottom:16px;left:50%;margin-left:-20px;width:40px;height:40px;border-radius:50%;border:1px solid var(--gold);background:#fffaf0ee;display:flex;gap:3px;align-items:flex-end;justify-content:center;padding:12px 0;cursor:pointer;box-shadow:0 4px 12px #6e1f2f30}
+#mus[hidden]{display:none}#mus i{width:3px;height:100%;background:var(--wine);border-radius:2px;transform-origin:bottom;animation:eq 1s ease-in-out infinite alternate}#mus i:nth-child(2){animation-delay:-.3s}#mus i:nth-child(3){animation-delay:-.6s}#mus i:nth-child(4){animation-delay:-.2s}
+#mus.off i{animation:none;transform:scaleY(.25)}@keyframes eq{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
 /* cover */
 #cover{position:fixed;inset:0;z-index:100;background:radial-gradient(circle at 50% 35%,#fbe9e6,#f1cfcf 70%);display:grid;place-items:center;overflow:hidden;transition:opacity 1.2s}
 #cover.gone{opacity:0;pointer-events:none}
@@ -74,8 +77,9 @@ section{position:relative;text-align:center;padding:96px 20px 70px}
 @keyframes kb{to{transform:scale(1.14)}}
 .arch .veil{position:absolute;inset:0;background:linear-gradient(#fbf5ece6,#fbf5ecd2 50%,#fbf5ecee)}
 .arch>*:not(.ph):not(.veil){position:relative}
-.med{width:clamp(44px,8svh,64px);aspect-ratio:1;border:1.5px solid var(--gold);border-radius:50%;display:grid;place-items:center;background:#fffaf0;margin-bottom:1.6svh}.med svg{width:68%}
-.nm{font-family:var(--pf);font-size:clamp(32px,7.4svh,50px);color:var(--wine);line-height:1.1;min-height:1.1em}
+.med{width:clamp(38px,6.4svh,54px);aspect-ratio:1;border:1.5px solid var(--gold);border-radius:50%;display:grid;place-items:center;background:#fffaf0;margin-bottom:1.6svh}.med svg{width:68%}
+.gl{font:italic 11px var(--pf);color:var(--gold);margin-top:.6svh}.gp{font-size:9.5px;line-height:1.45;color:#5b4047;margin-bottom:.4svh}
+.nm{font-family:var(--pf);font-size:clamp(28px,6svh,44px);color:var(--wine);line-height:1.1;min-height:1.1em}
 .rl{font-size:9px;letter-spacing:.28em;color:var(--gold);font-weight:500;text-transform:uppercase;margin:.8svh 0 .3svh}
 .pr{font-size:11px;line-height:1.5;color:#5b4047}
 .amp{font:italic 26px var(--pf);color:var(--gold);margin:.6svh 0}
@@ -153,8 +157,10 @@ a.mapc{display:block;border-radius:22px;overflow:hidden;background:#fffaf0;borde
 <section id="first"><div class="arch"><div class="ph" id="ph"></div><div class="veil"></div>
   <div class="med"><svg viewBox="0 0 100 100"><use href="#ganesh"/></svg></div>
   <div class="eyebrow bi" style="font-size:8px">Together with their families</div>
+  <div class="gl bi">Granddaughter of</div><div class="gp bi">Late Smt. Sudesh Sahni &amp; Late Sh. Manmohan Lal Sahni</div>
   <div class="nm" id="n1"></div><div class="rl bi" id="r1">Daughter of</div><div class="pr bi" id="p1">Mr. Sanjay Sahni &amp; Mrs. Jyoti Sahni</div>
   <div class="amp bi" id="amp">&amp;</div>
+  <div class="gl bi">Grandson of</div><div class="gp bi">Late Smt. Krishna Devi &amp; Late Sh. Mitter Sain Khurana</div>
   <div class="nm" id="n2"></div><div class="rl bi" id="r2">Son of</div><div class="pr bi" id="p2">Mr. Ajay Khurana &amp; Mrs. Sangeeta Khurana</div>
   <div class="inv bi" id="inv">request the pleasure of your<br>company at their wedding</div>
   </div><div class="arr">Scroll<svg width="16" height="10" viewBox="0 0 16 10" fill="none" stroke="#6e1f2f" stroke-width="1.5"><path d="M1 1l7 7 7-7"/></svg></div></section>
@@ -197,6 +203,8 @@ a.mapc{display:block;border-radius:22px;overflow:hidden;background:#fffaf0;borde
   <h2 class="bi">We can't wait to celebrate with you</h2><p class="bi">With love &amp; blessings</p><p class="fam bi">The Sahni &amp; Khurana families</p>
   <p class="bi" style="margin-top:30px;font-size:12px">Deeksha &amp; Sajal · 31 January 2027</p></section>
 </main>
+<audio id="aud" loop preload="auto" src="song.mp3"></audio>
+<button id="mus" hidden aria-label="Play or pause music"><i></i><i></i><i></i><i></i></button>
 <div id="petals"></div>
 
 <script>
@@ -253,10 +261,15 @@ function typeIn(el,txt,delay){[...txt].forEach((c,i)=>{const s=document.createEl
 let started=false;function startFirst(){if(started)return;started=true;if(PHOTOS[0])$('#ph').style.backgroundImage=`url(${PHOTOS[0]})`;
  ['.eyebrow'].forEach(()=>{});$$('#first .bi').forEach(e=>e.classList.add('in'));
  typeIn($('#n1'),'Deeksha',300);typeIn($('#n2'),'Sajal',900)}
+// ---- music ----
+const aud=$('#aud'),mus=$('#mus');aud.addEventListener('error',()=>{mus.hidden=true});
+aud.addEventListener('play',()=>mus.classList.remove('off'));aud.addEventListener('pause',()=>mus.classList.add('off'));
+function musicIn(){try{aud.volume=0;const p=aud.play();if(p)p.then(()=>{mus.hidden=false;let v=0;const t=setInterval(()=>{v=Math.min(.6,v+.03);aud.volume=v;if(v>=.6)clearInterval(t)},120)}).catch(()=>{})}catch(e){}}
+mus.onclick=()=>{aud.paused?aud.play().catch(()=>{}):aud.pause()};
 // ---- cover flow ----
 const ready=Promise.all([document.fonts.ready,new Promise(r=>setTimeout(r,900))]);
 ready.then(()=>{$('#loader').style.display='none';$('#tap').style.display='flex'});
-let opened=false;$('#book').onclick=()=>{if(!ready||opened)return;if($('#tap').style.display!=='flex')return;opened=true;
+let opened=false;$('#book').onclick=()=>{if(!ready||opened)return;if($('#tap').style.display!=='flex')return;opened=true;musicIn();
  $('#book').classList.add('open');$('#tap').style.opacity=0;petals(26,.6);
  setTimeout(()=>$('#scene').classList.add('zoom'),1500);
  setTimeout(()=>{$('#cover').classList.add('gone');document.body.classList.remove('locked');scrollTo(0,0);startFirst()},2700);
